@@ -43,6 +43,7 @@ DROP TABLE IF EXISTS `cars`;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `cars` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `owner_id` int(10) unsigned NOT NULL,
   `brand` varchar(100) NOT NULL,
   `model` varchar(100) NOT NULL,
   `year` smallint(5) unsigned NOT NULL,
@@ -59,7 +60,9 @@ CREATE TABLE `cars` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_cars_license_plate` (`license_plate`)
+  UNIQUE KEY `uq_cars_license_plate` (`license_plate`),
+  KEY `fk_cars_owner` (`owner_id`),
+  CONSTRAINT `fk_cars_owner` FOREIGN KEY (`owner_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `rentals`;
@@ -95,7 +98,7 @@ CREATE TABLE `users` (
   `email` varchar(255) NOT NULL,
   `phone_number` varchar(30) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `role` enum('employee','customer') NOT NULL DEFAULT 'customer',
+  `role` enum('owner','customer') NOT NULL DEFAULT 'customer',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),

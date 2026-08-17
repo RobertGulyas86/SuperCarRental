@@ -75,21 +75,25 @@ at `http://127.0.0.1:8000/docs`.
 | POST | `/auth/register` | Create a new user (`first_name`, `last_name`, `email`, `phone_number`, `password`) |
 | POST | `/auth/login` | Log in with `email` + `password`, returns a JWT access token |
 | GET | `/auth/me` | Returns the current user; requires `Authorization: Bearer <token>` |
-| GET | `/cars` | List cars |
+| GET | `/cars` | List all cars (public) |
+| GET | `/cars/mine` | List the current owner's own cars (owner only) |
 | GET | `/cars/{car_id}` | Get a single car |
-| POST | `/cars` | Create a car (employee only) |
-| PUT | `/cars/{car_id}` | Update a car (employee only) |
-| DELETE | `/cars/{car_id}` | Delete a car (employee only) |
+| POST | `/cars` | Create a car; the caller becomes its owner (owner only) |
+| PUT | `/cars/{car_id}` | Update a car (owner only, must own the car) |
+| DELETE | `/cars/{car_id}` | Delete a car (owner only, must own the car) |
 | GET | `/cars/{car_id}/images` | List a car's images |
 | GET | `/cars/{car_id}/images/{image_id}` | Get a single car image |
-| POST | `/cars/{car_id}/images` | Register an image by path/URL, no file bytes (employee only) |
-| POST | `/cars/{car_id}/images/upload` | Upload an image file (`multipart/form-data`: `file`, `is_primary`) (employee only) |
-| PUT | `/cars/{car_id}/images/{image_id}` | Update a car image's metadata (employee only) |
-| DELETE | `/cars/{car_id}/images/{image_id}` | Delete a car image (also removes the file from disk if it was uploaded) (employee only) |
+| POST | `/cars/{car_id}/images` | Register an image by path/URL, no file bytes (owner only, must own the car) |
+| POST | `/cars/{car_id}/images/upload` | Upload an image file (`multipart/form-data`: `file`, `is_primary`) (owner only, must own the car) |
+| PUT | `/cars/{car_id}/images/{image_id}` | Update a car image's metadata (owner only, must own the car) |
+| DELETE | `/cars/{car_id}/images/{image_id}` | Delete a car image (also removes the file from disk if it was uploaded) (owner only, must own the car) |
+| GET | `/rentals` | List rentals: an owner sees rentals for their own cars, a customer sees their own bookings |
 
-Employee-only endpoints require `Authorization: Bearer <token>` for a user
-with `role = employee`; car/image reads are public. `Car.has_highway_vignette`
-tracks whether the vehicle comes with a highway vignette.
+Owner-only endpoints require `Authorization: Bearer <token>` for a user with
+`role = owner`, and mutating endpoints on a specific car additionally require
+that user to be the car's `owner_id`; car/image reads are public.
+`Car.has_highway_vignette` tracks whether the vehicle comes with a highway
+vignette.
 
 **Image storage:** uploaded files are saved to disk under `UPLOAD_DIR`
 (default `backend/uploads/`, gitignored), namespaced per car as

@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from config import settings
-from routers import auth, car_images, cars
+from routers import auth, car_images, cars, rentals
 
 app = FastAPI(title="Super Car Rental API")
 
@@ -24,6 +24,7 @@ app.mount("/uploads", StaticFiles(directory=upload_dir), name="uploads")
 app.include_router(auth.router, prefix="/auth")
 app.include_router(cars.router)
 app.include_router(car_images.router)
+app.include_router(rentals.router)
 
 
 @app.get("/health")

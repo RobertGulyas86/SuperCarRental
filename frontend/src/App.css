@@ -77,7 +77,17 @@
 
 .hero {
   padding-block: 64px 56px;
-  text-align: center;
+}
+
+.hero-inner {
+  display: flex;
+  align-items: center;
+  gap: 48px;
+}
+
+.hero-content {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .hero h1 {
@@ -87,6 +97,36 @@
 .lead {
   font-size: 18px;
   margin-bottom: 40px;
+}
+
+.hero-media {
+  flex: 0 0 auto;
+  width: 520px;
+  max-width: 100%;
+}
+
+.hero-media img {
+  display: block;
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+  border-radius: 16px;
+}
+
+@media (max-width: 900px) {
+  .hero-inner {
+    flex-direction: column;
+  }
+
+  .hero-content {
+    text-align: center;
+    width: 100%;
+  }
+
+  .hero-media {
+    width: 100%;
+    max-width: 520px;
+  }
 }
 
 .search-card {
@@ -130,6 +170,15 @@
   outline-offset: 1px;
 }
 
+.field select {
+  font: inherit;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text-h);
+}
+
 .search-button {
   font: inherit;
   font-weight: 600;
@@ -164,9 +213,24 @@
 }
 
 .feature-card {
+  max-width: 330px;
+  width: 100%;
+  margin-inline: auto;
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 24px;
+  overflow: hidden;
+  background: var(--code-bg);
+}
+
+.feature-card-image {
+  display: block;
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.feature-card-body {
+  padding: 20px 24px 24px;
 }
 
 .feature-card h3 {
@@ -288,4 +352,359 @@
   padding: 0;
   cursor: pointer;
   text-decoration: underline;
+}
+
+.dashboard-page {
+  padding-block: 40px 64px;
+}
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.dashboard h1 {
+  margin: 0;
+  font-size: 32px;
+}
+
+.dashboard-section h2 {
+  font-size: 22px;
+  margin: 0 0 16px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.section-header h2 {
+  margin: 0;
+}
+
+.rental-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rental-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px;
+}
+
+.rental-meta {
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.rental-row-end {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  white-space: nowrap;
+}
+
+.status-badge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.status-available,
+.status-reserved {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+}
+
+.status-rented,
+.status-ongoing {
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+.status-maintenance,
+.status-cancelled {
+  background: rgba(229, 72, 77, 0.15);
+  color: #e5484d;
+}
+
+.status-completed {
+  background: rgba(148, 163, 184, 0.15);
+  color: #94a3b8;
+}
+
+.car-ticket-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.car-ticket {
+  display: flex;
+  flex-direction: column;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.car-ticket-image {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  background: var(--bg);
+}
+
+.car-ticket-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.car-ticket-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.car-ticket-image .status-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.car-ticket-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.car-ticket-body h3 {
+  font-size: 17px;
+  margin: 0;
+  color: var(--text-h);
+}
+
+.car-ticket-meta {
+  font-size: 13px;
+}
+
+.car-ticket-price {
+  font-weight: 600;
+  color: var(--text-h);
+  margin-top: 4px;
+}
+
+.car-ticket-body .link-button {
+  margin-top: 8px;
+  align-self: flex-start;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 100;
+  overflow-y: auto;
+}
+
+.modal-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  max-width: 640px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 28px;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--text);
+  padding: 0 4px;
+}
+
+.car-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.image-manager {
+  margin-top: 28px;
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+}
+
+.image-manager h3 {
+  margin: 0 0 12px;
+  font-size: 16px;
+  color: var(--text-h);
+}
+
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.image-thumb {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--code-bg);
+}
+
+.image-thumb img {
+  width: 100%;
+  height: 90px;
+  object-fit: cover;
+  display: block;
+}
+
+.image-primary-badge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 999px;
+}
+
+.image-thumb-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+  padding: 6px;
+}
+
+.image-thumb-actions button {
+  font: inherit;
+  font-size: 11px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.image-delete {
+  color: #e5484d !important;
+  border-color: rgba(229, 72, 77, 0.4) !important;
+}
+
+.image-upload-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 120px;
+  border: 2px dashed var(--border);
+  border-radius: 8px;
+  background: var(--code-bg);
+  color: var(--text);
+  font-size: 11px;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    color 0.2s;
+}
+
+.image-upload-tile:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.image-upload-tile.uploading {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.image-upload-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.image-upload-input:disabled {
+  cursor: default;
+}
+
+.image-upload-plus {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  font-size: 18px;
+  line-height: 1;
+}
+
+@media (max-width: 600px) {
+  .car-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rental-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }

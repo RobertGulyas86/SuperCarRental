@@ -13,9 +13,9 @@ const ROLE_OPTIONS: { role: Role; title: string; text: string }[] = [
     text: 'Autót keresek, amit kibérelhetek egy utazáshoz vagy a mindennapokra.',
   },
   {
-    role: 'employee',
+    role: 'owner',
     title: 'Bérbe szeretnék adni',
-    text: 'A flotta kezelőjeként autókat szeretnék felvenni és bérbe adni.',
+    text: 'A saját autómat szeretném feltölteni és bérbe adni.',
   },
 ]
 

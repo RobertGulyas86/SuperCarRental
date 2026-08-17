@@ -50,5 +50,5 @@ export function useAuth() {
     setUser(null)
   }, [])
 
-  return { user, loading, signIn, signOut }
+  return { user, token, loading, signIn, signOut }
 }

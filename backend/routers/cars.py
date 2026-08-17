@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from database import get_db
 from models import Car, User
-from routers.auth import require_employee
+from routers.auth import require_owner
 from schemas import CarCreate, CarOut, CarUpdate
 
 router = APIRouter(prefix="/cars", tags=["cars"])
@@ -16,9 +16,28 @@ def get_car_or_404(car_id: int, db: Session) -> Car:
     return car
 
 
+def require_own_car(car: Car, current_user: User) -> None:
+    if car.owner_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not the owner of this car")
+
+
 @router.get("", response_model=list[CarOut])
 def list_cars(db: Session = Depends(get_db)):
-    return db.query(Car).order_by(Car.id).all()
+    return db.query(Car).options(selectinload(Car.images)).order_by(Car.id).all()
+
+
+@router.get("/mine", response_model=list[CarOut])
+def list_my_cars(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_owner),
+):
+    return (
+        db.query(Car)
+        .options(selectinload(Car.images))
+        .filter(Car.owner_id == current_user.id)
+        .order_by(Car.id)
+        .all()
+    )
 
 
 @router.get("/{car_id}", response_model=CarOut)
@@ -30,12 +49,12 @@ def get_car(car_id: int, db: Session = Depends(get_db)):
 def create_car(
     payload: CarCreate,
     db: Session = Depends(get_db),
-    _: User = Depends(require_employee),
+    current_user: User = Depends(require_owner),
 ):
     if db.query(Car).filter(Car.license_plate == payload.license_plate).first():
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="License plate already registered")
 
-    car = Car(**payload.model_dump())
+    car = Car(**payload.model_dump(), owner_id=current_user.id)
     db.add(car)
     db.commit()
     db.refresh(car)
@@ -47,9 +66,10 @@ def update_car(
     car_id: int,
     payload: CarUpdate,
     db: Session = Depends(get_db),
-    _: User = Depends(require_employee),
+    current_user: User = Depends(require_owner),
 ):
     car = get_car_or_404(car_id, db)
+    require_own_car(car, current_user)
 
     updates = payload.model_dump(exclude_unset=True)
     if "license_plate" in updates and updates["license_plate"] != car.license_plate:
@@ -68,8 +88,9 @@ def update_car(
 def delete_car(
     car_id: int,
     db: Session = Depends(get_db),
-    _: User = Depends(require_employee),
+    current_user: User = Depends(require_owner),
 ):
     car = get_car_or_404(car_id, db)
+    require_own_car(car, current_user)
     db.delete(car)
     db.commit()

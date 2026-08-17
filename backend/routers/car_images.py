@@ -7,8 +7,8 @@ from sqlalchemy.orm import Session
 from config import settings
 from database import get_db
 from models import CarImage, User
-from routers.auth import require_employee
-from routers.cars import get_car_or_404
+from routers.auth import require_owner
+from routers.cars import get_car_or_404, require_own_car
 from schemas import CarImageCreate, CarImageOut, CarImageUpdate
 
 router = APIRouter(prefix="/cars/{car_id}/images", tags=["car-images"])
@@ -53,9 +53,10 @@ def create_car_image(
     car_id: int,
     payload: CarImageCreate,
     db: Session = Depends(get_db),
-    _: User = Depends(require_employee),
+    current_user: User = Depends(require_owner),
 ):
-    get_car_or_404(car_id, db)
+    car = get_car_or_404(car_id, db)
+    require_own_car(car, current_user)
 
     if payload.is_primary:
         db.query(CarImage).filter(CarImage.car_id == car_id).update({"is_primary": False})
@@ -73,9 +74,10 @@ def upload_car_image(
     file: UploadFile = File(...),
     is_primary: bool = Form(False),
     db: Session = Depends(get_db),
-    _: User = Depends(require_employee),
+    current_user: User = Depends(require_owner),
 ):
-    get_car_or_404(car_id, db)
+    car = get_car_or_404(car_id, db)
+    require_own_car(car, current_user)
 
     extension = ALLOWED_CONTENT_TYPES.get(file.content_type)
     if extension is None:
@@ -114,9 +116,10 @@ def update_car_image(
     image_id: int,
     payload: CarImageUpdate,
     db: Session = Depends(get_db),
-    _: User = Depends(require_employee),
+    current_user: User = Depends(require_owner),
 ):
-    get_car_or_404(car_id, db)
+    car = get_car_or_404(car_id, db)
+    require_own_car(car, current_user)
     image = get_car_image_or_404(car_id, image_id, db)
 
     updates = payload.model_dump(exclude_unset=True)
@@ -138,9 +141,10 @@ def delete_car_image(
     car_id: int,
     image_id: int,
     db: Session = Depends(get_db),
-    _: User = Depends(require_employee),
+    current_user: User = Depends(require_owner),
 ):
-    get_car_or_404(car_id, db)
+    car = get_car_or_404(car_id, db)
+    require_own_car(car, current_user)
     image = get_car_image_or_404(car_id, image_id, db)
     _delete_uploaded_file(image.image_path)
     db.delete(image)

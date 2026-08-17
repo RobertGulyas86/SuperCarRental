@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
@@ -10,7 +10,7 @@ class UserRegister(BaseModel):
     email: EmailStr
     phone_number: str = Field(min_length=1, max_length=30)
     password: str = Field(min_length=8, max_length=72)
-    role: Literal["customer", "employee"] = "customer"
+    role: Literal["customer", "owner"] = "customer"
 
 
 class UserLogin(BaseModel):
@@ -77,14 +77,6 @@ class CarUpdate(BaseModel):
     status: CarStatus | None = None
 
 
-class CarOut(CarBase):
-    model_config = ConfigDict(from_attributes=True)
-
-    id: int
-    created_at: datetime
-    updated_at: datetime
-
-
 class CarImageBase(BaseModel):
     image_path: str = Field(min_length=1, max_length=255)
     is_primary: bool = False
@@ -104,4 +96,40 @@ class CarImageOut(CarImageBase):
 
     id: int
     car_id: int
+    created_at: datetime
+
+
+class CarOut(CarBase):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    owner_id: int
+    created_at: datetime
+    updated_at: datetime
+    images: list[CarImageOut] = []
+
+
+class CarLocationOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str
+    address: str
+    city: str
+    postal_code: str | None = None
+
+
+RentalStatus = Literal["reserved", "ongoing", "completed", "cancelled"]
+
+
+class RentalOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    car: CarOut
+    location: CarLocationOut
+    start_date: date
+    end_date: date
+    total_price: float
+    status: RentalStatus
     created_at: datetime
