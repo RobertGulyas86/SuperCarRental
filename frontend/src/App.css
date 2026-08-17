@@ -21,6 +21,7 @@
   font-weight: 600;
   font-size: 20px;
   color: var(--text-h);
+  cursor: pointer;
 }
 
 .site-header nav {
@@ -59,6 +60,21 @@
   color: #fff;
 }
 
+.login-button.ghost {
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.login-button.ghost:hover {
+  background: var(--code-bg);
+  color: var(--text-h);
+}
+
+.user-greeting {
+  font-size: 15px;
+  color: var(--text-h);
+}
+
 .hero {
   padding-block: 64px 56px;
   text-align: center;
@@ -86,10 +102,13 @@
 }
 
 .field {
-  flex: 1 1 160px;
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+.search-card .field {
+  flex: 1 1 160px;
 }
 
 .field label {
@@ -112,7 +131,6 @@
 }
 
 .search-button {
-  flex: 1 1 160px;
   font: inherit;
   font-weight: 600;
   padding: 11px 20px;
@@ -126,6 +144,10 @@
 
 .search-button:hover {
   opacity: 0.9;
+}
+
+.search-card .search-button {
+  flex: 1 1 160px;
 }
 
 .features {
@@ -172,4 +194,98 @@
     flex-direction: column;
     align-items: stretch;
   }
+}
+
+.auth-section {
+  padding-block: 56px;
+  display: flex;
+  justify-content: center;
+}
+
+.auth-card {
+  max-width: 440px;
+  margin: 0 auto;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 32px;
+  text-align: left;
+}
+
+.auth-card h1 {
+  font-size: 32px;
+  margin: 0 0 20px;
+}
+
+.lead-small {
+  font-size: 15px;
+  margin-bottom: 24px;
+}
+
+.role-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.role-card {
+  font: inherit;
+  text-align: left;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+}
+
+.role-card:hover {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.role-card h3 {
+  font-size: 17px;
+  color: var(--text-h);
+  margin: 0 0 6px;
+}
+
+.role-card p {
+  font-size: 14px;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.auth-form .field input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-error {
+  font-size: 14px;
+  color: #e5484d;
+  margin: 0;
+}
+
+.auth-switch {
+  margin-top: 20px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.link-button {
+  font: inherit;
+  font-size: inherit;
+  color: var(--accent);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
 }

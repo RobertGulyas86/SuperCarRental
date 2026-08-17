@@ -10,6 +10,7 @@ class UserRegister(BaseModel):
     email: EmailStr
     phone_number: str = Field(min_length=1, max_length=30)
     password: str = Field(min_length=8, max_length=72)
+    role: Literal["customer", "employee"] = "customer"
 
 
 class UserLogin(BaseModel):
