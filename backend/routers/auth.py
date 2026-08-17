@@ -20,6 +20,7 @@ def register(payload: UserRegister, db: Session = Depends(get_db)):
         first_name=payload.first_name,
         last_name=payload.last_name,
         email=payload.email,
+        phone_number=payload.phone_number,
         password=hash_password(payload.password),
     )
     db.add(user)
@@ -55,4 +56,10 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
 
 @router.get("/me", response_model=UserOut)
 def read_current_user(current_user: User = Depends(get_current_user)):
+    return current_user
+
+
+def require_employee(current_user: User = Depends(get_current_user)) -> User:
+    if current_user.role != "employee":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Employee access required")
     return current_user

@@ -6,6 +6,8 @@ class Settings(BaseSettings):
     jwt_secret_key: str
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60
+    upload_dir: str = "uploads"
+    max_upload_size_mb: int = 5
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
