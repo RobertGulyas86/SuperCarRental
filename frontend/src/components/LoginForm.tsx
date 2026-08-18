@@ -27,44 +27,52 @@ function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
   }
 
   return (
-    <div className="auth-card">
-      <h1>Bejelentkezés</h1>
+    <div className="card mx-auto" style={{ maxWidth: 440 }}>
+      <div className="card-body p-4">
+        <h1 className="h3 mb-4">Bejelentkezés</h1>
 
-      <form className="auth-form" onSubmit={handleSubmit}>
-        <div className="field">
-          <label htmlFor="login-email">E-mail cím</label>
-          <input
-            id="login-email"
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-        <div className="field">
-          <label htmlFor="login-password">Jelszó</label>
-          <input
-            id="login-password"
-            type="password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
+        <form className="d-flex flex-column gap-3" onSubmit={handleSubmit}>
+          <div>
+            <label className="form-label" htmlFor="login-email">
+              E-mail cím
+            </label>
+            <input
+              id="login-email"
+              type="email"
+              className="form-control"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="form-label" htmlFor="login-password">
+              Jelszó
+            </label>
+            <input
+              id="login-password"
+              type="password"
+              className="form-control"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
 
-        {error && <p className="form-error">{error}</p>}
+          {error && <p className="text-danger small mb-0">{error}</p>}
 
-        <button type="submit" className="search-button" disabled={submitting}>
-          {submitting ? 'Bejelentkezés...' : 'Bejelentkezés'}
-        </button>
-      </form>
+          <button type="submit" className="btn btn-primary" disabled={submitting}>
+            {submitting ? 'Bejelentkezés...' : 'Bejelentkezés'}
+          </button>
+        </form>
 
-      <p className="auth-switch">
-        Nincs még fiókod?{' '}
-        <button type="button" className="link-button" onClick={onSwitchToRegister}>
-          Regisztrálj
-        </button>
-      </p>
+        <p className="text-center small mt-4 mb-0">
+          Nincs még fiókod?{' '}
+          <button type="button" className="btn btn-link p-0 align-baseline" onClick={onSwitchToRegister}>
+            Regisztrálj
+          </button>
+        </p>
+      </div>
     </div>
   )
 }

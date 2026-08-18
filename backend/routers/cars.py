@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session, selectinload
+from sqlalchemy.orm import Session, joinedload, selectinload
 
 from database import get_db
 from models import Car, User
 from routers.auth import require_owner
 from schemas import CarCreate, CarOut, CarUpdate
+from storage import delete_uploaded_file
 
 router = APIRouter(prefix="/cars", tags=["cars"])
 
@@ -23,7 +24,12 @@ def require_own_car(car: Car, current_user: User) -> None:
 
 @router.get("", response_model=list[CarOut])
 def list_cars(db: Session = Depends(get_db)):
-    return db.query(Car).options(selectinload(Car.images)).order_by(Car.id).all()
+    return (
+        db.query(Car)
+        .options(selectinload(Car.images), joinedload(Car.owner))
+        .order_by(Car.id)
+        .all()
+    )
 
 
 @router.get("/mine", response_model=list[CarOut])
@@ -33,7 +39,7 @@ def list_my_cars(
 ):
     return (
         db.query(Car)
-        .options(selectinload(Car.images))
+        .options(selectinload(Car.images), joinedload(Car.owner))
         .filter(Car.owner_id == current_user.id)
         .order_by(Car.id)
         .all()
@@ -92,5 +98,7 @@ def delete_car(
 ):
     car = get_car_or_404(car_id, db)
     require_own_car(car, current_user)
+    for image in car.images:
+        delete_uploaded_file(image.image_path)
     db.delete(car)
     db.commit()

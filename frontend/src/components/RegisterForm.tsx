@@ -68,119 +68,143 @@ function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) {
 
   if (step === 'role') {
     return (
-      <div className="auth-card">
-        <h1>Regisztráció</h1>
-        <p className="lead-small">Először válaszd ki, mire szeretnéd használni a fiókod.</p>
+      <div className="card mx-auto" style={{ maxWidth: 440 }}>
+        <div className="card-body p-4">
+          <h1 className="h3 mb-2">Regisztráció</h1>
+          <p className="text-body-secondary small mb-4">
+            Először válaszd ki, mire szeretnéd használni a fiókod.
+          </p>
 
-        <div className="role-grid">
-          {ROLE_OPTIONS.map((option) => (
-            <button
-              type="button"
-              key={option.role}
-              className="role-card"
-              onClick={() => selectRole(option.role)}
-            >
-              <h3>{option.title}</h3>
-              <p>{option.text}</p>
+          <div className="d-flex flex-column gap-3">
+            {ROLE_OPTIONS.map((option) => (
+              <button
+                type="button"
+                key={option.role}
+                className="btn btn-outline-secondary text-start p-3"
+                onClick={() => selectRole(option.role)}
+              >
+                <span className="d-block fw-semibold mb-1">{option.title}</span>
+                <span className="d-block small text-body-secondary">{option.text}</span>
+              </button>
+            ))}
+          </div>
+
+          <p className="text-center small mt-4 mb-0">
+            Van már fiókod?{' '}
+            <button type="button" className="btn btn-link p-0 align-baseline" onClick={onSwitchToLogin}>
+              Jelentkezz be
             </button>
-          ))}
+          </p>
         </div>
-
-        <p className="auth-switch">
-          Van már fiókod?{' '}
-          <button type="button" className="link-button" onClick={onSwitchToLogin}>
-            Jelentkezz be
-          </button>
-        </p>
       </div>
     )
   }
 
   return (
-    <div className="auth-card">
-      <h1>Regisztráció</h1>
-      <p className="lead-small">
-        {role === 'customer' ? 'Bérlőként regisztrálsz.' : 'Bérbeadóként regisztrálsz.'}{' '}
-        <button type="button" className="link-button" onClick={() => setStep('role')}>
-          Módosítom
-        </button>
-      </p>
+    <div className="card mx-auto" style={{ maxWidth: 440 }}>
+      <div className="card-body p-4">
+        <h1 className="h3 mb-2">Regisztráció</h1>
+        <p className="text-body-secondary small mb-4">
+          {role === 'customer' ? 'Bérlőként regisztrálsz.' : 'Bérbeadóként regisztrálsz.'}{' '}
+          <button type="button" className="btn btn-link p-0 align-baseline" onClick={() => setStep('role')}>
+            Módosítom
+          </button>
+        </p>
 
-      <form className="auth-form" onSubmit={handleSubmit}>
-        <div className="field">
-          <label htmlFor="first-name">Keresztnév</label>
-          <input
-            id="first-name"
-            required
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-          />
-        </div>
-        <div className="field">
-          <label htmlFor="last-name">Vezetéknév</label>
-          <input
-            id="last-name"
-            required
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-          />
-        </div>
-        <div className="field">
-          <label htmlFor="email">E-mail cím</label>
-          <input
-            id="email"
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-        <div className="field">
-          <label htmlFor="phone-number">Telefonszám</label>
-          <input
-            id="phone-number"
-            type="tel"
-            required
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-          />
-        </div>
-        <div className="field">
-          <label htmlFor="password">Jelszó</label>
-          <input
-            id="password"
-            type="password"
-            required
-            minLength={8}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-        <div className="field">
-          <label htmlFor="confirm-password">Jelszó megerősítése</label>
-          <input
-            id="confirm-password"
-            type="password"
-            required
-            minLength={8}
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-          />
-        </div>
+        <form className="d-flex flex-column gap-3" onSubmit={handleSubmit}>
+          <div>
+            <label className="form-label" htmlFor="first-name">
+              Keresztnév
+            </label>
+            <input
+              id="first-name"
+              className="form-control"
+              required
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="form-label" htmlFor="last-name">
+              Vezetéknév
+            </label>
+            <input
+              id="last-name"
+              className="form-control"
+              required
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="form-label" htmlFor="email">
+              E-mail cím
+            </label>
+            <input
+              id="email"
+              type="email"
+              className="form-control"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="form-label" htmlFor="phone-number">
+              Telefonszám
+            </label>
+            <input
+              id="phone-number"
+              type="tel"
+              className="form-control"
+              required
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="form-label" htmlFor="password">
+              Jelszó
+            </label>
+            <input
+              id="password"
+              type="password"
+              className="form-control"
+              required
+              minLength={8}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="form-label" htmlFor="confirm-password">
+              Jelszó megerősítése
+            </label>
+            <input
+              id="confirm-password"
+              type="password"
+              className="form-control"
+              required
+              minLength={8}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+          </div>
 
-        {error && <p className="form-error">{error}</p>}
+          {error && <p className="text-danger small mb-0">{error}</p>}
 
-        <button type="submit" className="search-button" disabled={submitting}>
-          {submitting ? 'Regisztráció...' : 'Regisztráció'}
-        </button>
-      </form>
+          <button type="submit" className="btn btn-primary" disabled={submitting}>
+            {submitting ? 'Regisztráció...' : 'Regisztráció'}
+          </button>
+        </form>
 
-      <p className="auth-switch">
-        Van már fiókod?{' '}
-        <button type="button" className="link-button" onClick={onSwitchToLogin}>
-          Jelentkezz be
-        </button>
-      </p>
+        <p className="text-center small mt-4 mb-0">
+          Van már fiókod?{' '}
+          <button type="button" className="btn btn-link p-0 align-baseline" onClick={onSwitchToLogin}>
+            Jelentkezz be
+          </button>
+        </p>
+      </div>
     </div>
   )
 }

@@ -14,15 +14,21 @@
 SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `car_images` WRITE;
 /*!40000 ALTER TABLE `car_images` DISABLE KEYS */;
+INSERT INTO `car_images` VALUES
+(4,4,'/uploads/cars/4/26904c5446684c159f96030918143c73.png',1,'2026-08-17 08:03:45'),
+(5,4,'/uploads/cars/4/fbc8875a4d084f7fafc5e6c8fbba09e0.png',0,'2026-08-17 08:03:51'),
+(6,4,'/uploads/cars/4/e570d919491a4bc398188fc59d597216.png',0,'2026-08-17 08:03:55'),
+(8,6,'/uploads/cars/6/f0cd3ddeab4848e28d2a5d02ac1f9b90.webp',0,'2026-08-17 09:04:18'),
+(9,6,'/uploads/cars/6/8ea2fdde0861432689c6f49da4fd9ae7.webp',1,'2026-08-17 09:04:20'),
+(10,6,'/uploads/cars/6/7970046f9b7e4464a1e2e2301aca51cb.webp',0,'2026-08-17 09:04:23'),
+(11,9,'/uploads/cars/9/32796a8c9d954092ad2a780487179120.webp',0,'2026-08-17 09:06:30'),
+(12,9,'/uploads/cars/9/21a271c9b33a4fd1a59e694947e25594.webp',1,'2026-08-17 09:06:32'),
+(13,12,'/uploads/cars/12/bedd4bba9946464e8e0a05c4f389bb7a.webp',0,'2026-08-17 09:30:02'),
+(14,12,'/uploads/cars/12/4a5d05ea361e42a98def86c074814d80.webp',0,'2026-08-17 09:30:05'),
+(15,12,'/uploads/cars/12/bf653f7e11484471a620e959fb7003a5.webp',0,'2026-08-17 09:30:08'),
+(16,12,'/uploads/cars/12/899a883f8461444b9f3138a40274d0b6.webp',0,'2026-08-17 09:30:10'),
+(17,12,'/uploads/cars/12/551f8de9f3b8463294eddbf24a161d49.webp',1,'2026-08-17 09:30:13');
 /*!40000 ALTER TABLE `car_images` ENABLE KEYS */;
-UNLOCK TABLES;
-COMMIT;
-SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
-
-SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
-LOCK TABLES `car_locations` WRITE;
-/*!40000 ALTER TABLE `car_locations` DISABLE KEYS */;
-/*!40000 ALTER TABLE `car_locations` ENABLE KEYS */;
 UNLOCK TABLES;
 COMMIT;
 SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
@@ -30,6 +36,11 @@ SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `cars` WRITE;
 /*!40000 ALTER TABLE `cars` DISABLE KEYS */;
+INSERT INTO `cars` VALUES
+(4,10,'Testla','Y AWD',2025,'automatic','electric',NULL,5,'fehér',NULL,'ABC-666',34900.00,'full',1,1,'available','2026-08-17 08:03:06','2026-08-17 09:28:43'),
+(6,11,'Nissan','Altima',2010,'manual','petrol',8.0,5,'Szürke','Miskolc','MGD918',8000.00,'basic',0,0,'available','2026-08-17 09:04:10','2026-08-17 09:04:10'),
+(9,11,'Dacia','Sandero',2024,'manual','petrol',NULL,5,'Bézs','Miskolc','AIJC089',140000.00,'full',1,1,'available','2026-08-17 09:06:24','2026-08-17 09:28:43'),
+(12,12,'Porche','Taycan',2022,'automatic','electric',NULL,4,'Fehér','Budaörs','IEE007',29000.00,'full',1,1,'available','2026-08-17 09:29:54','2026-08-17 09:29:54');
 /*!40000 ALTER TABLE `cars` ENABLE KEYS */;
 UNLOCK TABLES;
 COMMIT;
@@ -46,6 +57,13 @@ SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES
+(6,'Róbert','Gulyás','contact@gmail.com','+30301234567','$2b$12$9H2tv8iAWLPY707Gts5ykumfpYCO.4Tl4OGfuXZPpp8/SNE1EzMVu','owner','2026-08-17 07:04:00','2026-08-17 08:21:28'),
+(10,'Bérbeadó1','1','berbeado1@gmail.com','+36300000001','$2b$12$zWd0WMWUOQFNN1p11Qxl5.kL2z.cV22whZGrs/sz8axaLJBZ.iz9y','owner','2026-08-17 07:58:16','2026-08-17 08:27:53'),
+(11,'Bérbeadó2','2','berbeado2@gmail.com','+36300000002','$2b$12$tQxBUHHlVYxX1iNACZA9euxlD17STOrq9b.w5pU0v54XV8NzWNDii','owner','2026-08-17 07:58:16','2026-08-17 08:27:53'),
+(12,'Bérbeadó3','3','berbeado3@gmail.com','+36300000003','$2b$12$McnJaZqs.oOZkXQU2rXBHef74uiPb1R3b8LwqkumtQd3YcpuCjXk2','owner','2026-08-17 07:58:16','2026-08-17 08:27:53'),
+(13,'Bérbeadó4','4','berbeado4@gmail.com','+36300000004','$2b$12$La1kA5SdQc1Wj5HBsZUzquylupuNZNOP4MmyFQCHnZ/UXy6UZEDX.','owner','2026-08-17 07:58:16','2026-08-17 08:27:53'),
+(14,'Bérbeadó5','5','berbeado5@gmail.com','+36300000005','$2b$12$gHPJ/TxqProTIBc95Mjaa.zCAFDVHhbQH08EDvroUAYcegSWL6FlS','owner','2026-08-17 07:58:17','2026-08-17 08:27:53');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 COMMIT;

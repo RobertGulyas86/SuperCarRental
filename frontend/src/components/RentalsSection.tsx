@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { ApiError, listRentals, type Rental, type RentalStatus } from '../api'
+import { ApiError, deleteRental, listRentals, type Rental, type RentalStatus } from '../api'
 
 interface RentalsSectionProps {
   token: string
@@ -10,6 +10,13 @@ const STATUS_LABELS: Record<RentalStatus, string> = {
   ongoing: 'Folyamatban',
   completed: 'Lezárva',
   cancelled: 'Lemondva',
+}
+
+const STATUS_BADGE: Record<RentalStatus, string> = {
+  reserved: 'text-bg-success',
+  ongoing: 'text-bg-primary',
+  completed: 'text-bg-secondary',
+  cancelled: 'text-bg-danger',
 }
 
 function formatDate(value: string) {
@@ -36,34 +43,59 @@ function RentalsSection({ token }: RentalsSectionProps) {
     }
   }, [token])
 
+  async function handleDelete(rental: Rental) {
+    if (!window.confirm(`Biztosan törlöd ezt a foglalást: ${rental.car.brand} ${rental.car.model}?`)) {
+      return
+    }
+    setError(null)
+    try {
+      await deleteRental(token, rental.id)
+      setRentals((prev) => prev?.filter((r) => r.id !== rental.id) ?? prev)
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Váratlan hiba történt.')
+    }
+  }
+
   return (
-    <section className="dashboard-section">
-      <h2>Foglalások</h2>
+    <section>
+      <h2 className="h4 mb-3">Foglalások</h2>
 
-      {error && <p className="form-error">{error}</p>}
+      {error && <p className="text-danger small">{error}</p>}
 
-      {!error && rentals === null && <p className="lead-small">Betöltés...</p>}
+      {!error && rentals === null && <p className="text-body-secondary small">Betöltés...</p>}
 
-      {rentals && rentals.length === 0 && <p className="lead-small">Jelenleg nincs foglalás</p>}
+      {rentals && rentals.length === 0 && (
+        <p className="text-body-secondary small">Jelenleg nincs foglalás</p>
+      )}
 
       {rentals && rentals.length > 0 && (
-        <div className="rental-list">
+        <div className="list-group">
           {rentals.map((rental) => (
-            <div className="rental-row" key={rental.id}>
+            <div
+              className="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2"
+              key={rental.id}
+            >
               <div>
                 <strong>
                   {rental.car.brand} {rental.car.model}
                 </strong>
-                <p className="rental-meta">
-                  {formatDate(rental.start_date)} – {formatDate(rental.end_date)} ·{' '}
-                  {rental.location.city}
+                <p className="small text-body-secondary mb-0 mt-1">
+                  {formatDate(rental.start_date)} – {formatDate(rental.end_date)}
+                  {rental.car.city && <> · {rental.car.city}</>}
                 </p>
               </div>
-              <div className="rental-row-end">
-                <span className={`status-badge status-${rental.status}`}>
+              <div className="d-flex align-items-center gap-3">
+                <span className={`badge rounded-pill ${STATUS_BADGE[rental.status]}`}>
                   {STATUS_LABELS[rental.status]}
                 </span>
-                <strong>{rental.total_price.toLocaleString('hu-HU')} Ft</strong>
+                <strong className="text-nowrap">{rental.total_price.toLocaleString('hu-HU')} Ft</strong>
+                <button
+                  type="button"
+                  className="btn btn-link p-0 text-danger"
+                  onClick={() => handleDelete(rental)}
+                >
+                  Törlés
+                </button>
               </div>
             </div>
           ))}

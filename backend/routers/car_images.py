@@ -1,5 +1,4 @@
 import uuid
-from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from sqlalchemy.orm import Session
@@ -10,16 +9,9 @@ from models import CarImage, User
 from routers.auth import require_owner
 from routers.cars import get_car_or_404, require_own_car
 from schemas import CarImageCreate, CarImageOut, CarImageUpdate
+from storage import ALLOWED_CONTENT_TYPES, UPLOAD_ROOT, delete_uploaded_file
 
 router = APIRouter(prefix="/cars/{car_id}/images", tags=["car-images"])
-
-UPLOAD_ROOT = Path(settings.upload_dir)
-ALLOWED_CONTENT_TYPES = {
-    "image/jpeg": ".jpg",
-    "image/png": ".png",
-    "image/webp": ".webp",
-    "image/gif": ".gif",
-}
 
 
 def get_car_image_or_404(car_id: int, image_id: int, db: Session) -> CarImage:
@@ -27,13 +19,6 @@ def get_car_image_or_404(car_id: int, image_id: int, db: Session) -> CarImage:
     if image is None or image.car_id != car_id:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Car image not found")
     return image
-
-
-def _delete_uploaded_file(image_path: str) -> None:
-    if not image_path.startswith("/uploads/"):
-        return
-    file_path = UPLOAD_ROOT / Path(image_path).relative_to("/uploads")
-    file_path.unlink(missing_ok=True)
 
 
 @router.get("", response_model=list[CarImageOut])
@@ -146,6 +131,6 @@ def delete_car_image(
     car = get_car_or_404(car_id, db)
     require_own_car(car, current_user)
     image = get_car_image_or_404(car_id, image_id, db)
-    _delete_uploaded_file(image.image_path)
+    delete_uploaded_file(image.image_path)
     db.delete(image)
     db.commit()

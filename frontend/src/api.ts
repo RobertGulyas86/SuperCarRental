@@ -39,9 +39,18 @@ export interface CarImage {
   created_at: string
 }
 
+export interface CarOwner {
+  id: number
+  first_name: string
+  last_name: string
+  phone_number: string
+  email: string
+}
+
 export interface Car {
   id: number
   owner_id: number
+  owner: CarOwner
   brand: string
   model: string
   year: number
@@ -50,10 +59,12 @@ export interface Car {
   fuel_consumption: number | null
   seats: number
   color: string | null
+  city: string | null
   license_plate: string
   daily_price: number
   insurance_type: InsuranceType
   has_highway_vignette: boolean
+  has_air_conditioning: boolean
   status: CarStatus
   created_at: string
   updated_at: string
@@ -69,19 +80,13 @@ export interface CarPayload {
   fuel_consumption: number | null
   seats: number
   color: string | null
+  city: string | null
   license_plate: string
   daily_price: number
   insurance_type: InsuranceType
   has_highway_vignette: boolean
+  has_air_conditioning: boolean
   status: CarStatus
-}
-
-export interface CarLocation {
-  id: number
-  name: string
-  address: string
-  city: string
-  postal_code: string | null
 }
 
 export type RentalStatus = 'reserved' | 'ongoing' | 'completed' | 'cancelled'
@@ -89,7 +94,6 @@ export type RentalStatus = 'reserved' | 'ongoing' | 'completed' | 'cancelled'
 export interface Rental {
   id: number
   car: Car
-  location: CarLocation
   start_date: string
   end_date: string
   total_price: number
@@ -158,6 +162,10 @@ export function listMyCars(token: string) {
   return request<Car[]>('/cars/mine', {
     headers: authHeaders(token),
   })
+}
+
+export function getCar(carId: number) {
+  return request<Car>(`/cars/${carId}`)
 }
 
 export function createCar(token: string, payload: CarPayload) {
@@ -229,6 +237,27 @@ export function deleteCarImage(token: string, carId: number, imageId: number) {
 export function listRentals(token: string) {
   return request<Rental[]>('/rentals', {
     headers: authHeaders(token),
+  })
+}
+
+export function deleteRental(token: string, rentalId: number) {
+  return request<void>(`/rentals/${rentalId}`, {
+    method: 'DELETE',
+    headers: authHeaders(token),
+  })
+}
+
+export interface RentalCreatePayload {
+  car_id: number
+  start_date: string
+  end_date: string
+}
+
+export function createRental(token: string, payload: RentalCreatePayload) {
+  return request<Rental>('/rentals', {
+    method: 'POST',
+    headers: authHeaders(token),
+    body: JSON.stringify(payload),
   })
 }
 

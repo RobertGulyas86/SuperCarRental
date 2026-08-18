@@ -1,0 +1,23 @@
+// Bootstrap, retheme-only: keep our own colors, get everything else
+// (grid, components, responsiveness) from Bootstrap itself.
+// https://getbootstrap.com/docs/5.3/customize/sass/
+
+@import 'bootstrap/scss/functions';
+
+// Brand color
+$primary: #aa3bff;
+
+// Light mode palette
+$body-bg: #fff;
+$body-color: #6b6375;
+$body-secondary-bg: #f4f3ec;
+$border-color: #e5e4e7;
+
+// Dark mode palette (auto, follows the OS theme — no toggle)
+$color-mode-type: media-query;
+$body-bg-dark: #16171d;
+$body-color-dark: #9ca3af;
+$body-secondary-bg-dark: #1f2028;
+$border-color-dark: #2e303a;
+
+@import 'bootstrap/scss/bootstrap';

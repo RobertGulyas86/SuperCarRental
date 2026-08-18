@@ -22,21 +22,7 @@ CREATE TABLE `car_images` (
   PRIMARY KEY (`id`),
   KEY `fk_car_images_car` (`car_id`),
   CONSTRAINT `fk_car_images_car` FOREIGN KEY (`car_id`) REFERENCES `cars` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `car_locations`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `car_locations` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(150) NOT NULL,
-  `address` varchar(255) NOT NULL,
-  `city` varchar(100) NOT NULL,
-  `postal_code` varchar(20) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `cars`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -52,10 +38,12 @@ CREATE TABLE `cars` (
   `fuel_consumption` decimal(4,1) DEFAULT NULL,
   `seats` tinyint(3) unsigned NOT NULL DEFAULT 5,
   `color` varchar(50) DEFAULT NULL,
+  `city` varchar(100) DEFAULT NULL,
   `license_plate` varchar(20) NOT NULL,
   `daily_price` decimal(10,2) NOT NULL,
   `insurance_type` enum('basic','full') NOT NULL DEFAULT 'basic',
   `has_highway_vignette` tinyint(1) NOT NULL DEFAULT 0,
+  `has_air_conditioning` tinyint(1) NOT NULL DEFAULT 0,
   `status` enum('available','rented','maintenance') NOT NULL DEFAULT 'available',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
@@ -63,7 +51,7 @@ CREATE TABLE `cars` (
   UNIQUE KEY `uq_cars_license_plate` (`license_plate`),
   KEY `fk_cars_owner` (`owner_id`),
   CONSTRAINT `fk_cars_owner` FOREIGN KEY (`owner_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `rentals`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -72,7 +60,6 @@ CREATE TABLE `rentals` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `car_id` int(10) unsigned NOT NULL,
   `customer_id` int(10) unsigned NOT NULL,
-  `location_id` int(10) unsigned NOT NULL,
   `start_date` date NOT NULL,
   `end_date` date NOT NULL,
   `total_price` decimal(10,2) NOT NULL,
@@ -82,11 +69,9 @@ CREATE TABLE `rentals` (
   PRIMARY KEY (`id`),
   KEY `fk_rentals_car` (`car_id`),
   KEY `fk_rentals_customer` (`customer_id`),
-  KEY `fk_rentals_location` (`location_id`),
   CONSTRAINT `fk_rentals_car` FOREIGN KEY (`car_id`) REFERENCES `cars` (`id`),
-  CONSTRAINT `fk_rentals_customer` FOREIGN KEY (`customer_id`) REFERENCES `users` (`id`),
-  CONSTRAINT `fk_rentals_location` FOREIGN KEY (`location_id`) REFERENCES `car_locations` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  CONSTRAINT `fk_rentals_customer` FOREIGN KEY (`customer_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -103,7 +88,7 @@ CREATE TABLE `users` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_users_email` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

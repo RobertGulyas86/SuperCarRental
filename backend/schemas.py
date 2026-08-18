@@ -50,10 +50,12 @@ class CarBase(BaseModel):
     fuel_consumption: float | None = Field(default=None, ge=0)
     seats: int = Field(default=5, ge=1, le=255)
     color: str | None = Field(default=None, max_length=50)
+    city: str | None = Field(default=None, max_length=100)
     license_plate: str = Field(min_length=1, max_length=20)
     daily_price: float = Field(ge=0)
     insurance_type: InsuranceType = "basic"
     has_highway_vignette: bool = False
+    has_air_conditioning: bool = False
     status: CarStatus = "available"
 
 
@@ -70,10 +72,12 @@ class CarUpdate(BaseModel):
     fuel_consumption: float | None = Field(default=None, ge=0)
     seats: int | None = Field(default=None, ge=1, le=255)
     color: str | None = Field(default=None, max_length=50)
+    city: str | None = Field(default=None, max_length=100)
     license_plate: str | None = Field(default=None, min_length=1, max_length=20)
     daily_price: float | None = Field(default=None, ge=0)
     insurance_type: InsuranceType | None = None
     has_highway_vignette: bool | None = None
+    has_air_conditioning: bool | None = None
     status: CarStatus | None = None
 
 
@@ -99,27 +103,34 @@ class CarImageOut(CarImageBase):
     created_at: datetime
 
 
+class CarOwnerOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    first_name: str
+    last_name: str
+    phone_number: str
+    email: EmailStr
+
+
 class CarOut(CarBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
     owner_id: int
+    owner: CarOwnerOut
     created_at: datetime
     updated_at: datetime
     images: list[CarImageOut] = []
 
 
-class CarLocationOut(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-    id: int
-    name: str
-    address: str
-    city: str
-    postal_code: str | None = None
-
-
 RentalStatus = Literal["reserved", "ongoing", "completed", "cancelled"]
+
+
+class RentalCreate(BaseModel):
+    car_id: int
+    start_date: date
+    end_date: date
 
 
 class RentalOut(BaseModel):
@@ -127,7 +138,6 @@ class RentalOut(BaseModel):
 
     id: int
     car: CarOut
-    location: CarLocationOut
     start_date: date
     end_date: date
     total_price: float

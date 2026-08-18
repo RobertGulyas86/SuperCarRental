@@ -1,92 +1,133 @@
 import { useState } from 'react'
 import './App.css'
+import CarDetailPage from './components/CarDetailPage'
+import CarsSlider from './components/CarsSlider'
+import ContactPage from './components/ContactPage'
 import Dashboard from './components/Dashboard'
+import FeatureCards from './components/FeatureCards'
 import LoginForm from './components/LoginForm'
 import RegisterForm from './components/RegisterForm'
+import ServicesPage from './components/ServicesPage'
 import { useAuth } from './useAuth'
 
-type View = 'home' | 'login' | 'register' | 'dashboard'
-
-const features = [
-  {
-    title: 'Széles választék',
-    text: 'Kompakt városi autóktól a prémium terepjárókig mindenre találsz megfelelőt.',
-    image: '/images/feature-selection.webp',
-  },
-  {
-    title: 'Egyszerű foglalás',
-    text: 'Válaszd ki az időpontot és az átvételi helyet, a többit intézzük.',
-    image: '/images/feature-booking.webp',
-  },
-  {
-    title: 'Teljes körű biztosítás',
-    text: 'Minden bérléshez alap- vagy prémium biztosítási csomagot választhatsz.',
-    image: '/images/feature-insurance.webp',
-  },
-]
+type View = 'home' | 'login' | 'register' | 'dashboard' | 'services' | 'contact' | 'car-detail'
 
 function App() {
   const [view, setView] = useState<View>('home')
+  const [navOpen, setNavOpen] = useState(false)
+  const [selectedCarId, setSelectedCarId] = useState<number | null>(null)
   const { user, token, signIn, signOut } = useAuth()
 
   function handleAuthSuccess(token: string) {
     signIn(token)
     setView('dashboard')
+    setNavOpen(false)
+  }
+
+  function goTo(next: View) {
+    setView(next)
+    setNavOpen(false)
+  }
+
+  function openCar(carId: number) {
+    setSelectedCarId(carId)
+    goTo('car-detail')
   }
 
   return (
     <>
-      <header className="site-header">
-        <div className="container header-inner">
-          <span className="logo" onClick={() => setView('home')} role="button" tabIndex={0}>
+      <header className="navbar navbar-expand-md border-bottom sticky-top bg-body">
+        <div className="container">
+          <span
+            className="navbar-brand fw-semibold"
+            role="button"
+            tabIndex={0}
+            onClick={() => goTo('home')}
+          >
             Super Car Rental
           </span>
-          <nav>
-            <a href="#autok">Autók</a>
-            <a href="#szolgaltatasok">Szolgáltatások</a>
-            <a href="#kapcsolat">Kapcsolat</a>
-            {user ? (
-              <>
-                <button
-                  type="button"
-                  className="login-button ghost"
-                  onClick={() => setView('dashboard')}
-                >
-                  Dashboard
-                </button>
-                <span className="user-greeting">Szia, {user.first_name}!</span>
-                <button
-                  type="button"
-                  className="login-button"
-                  onClick={() => {
-                    signOut()
-                    setView('home')
-                  }}
-                >
-                  Kijelentkezés
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  type="button"
-                  className="login-button ghost"
-                  onClick={() => setView('register')}
-                >
-                  Regisztráció
-                </button>
-                <button type="button" className="login-button" onClick={() => setView('login')}>
-                  Bejelentkezés
-                </button>
-              </>
-            )}
-          </nav>
+          <button
+            type="button"
+            className="navbar-toggler"
+            aria-label="Menü megnyitása"
+            aria-expanded={navOpen}
+            onClick={() => setNavOpen((open) => !open)}
+          >
+            <span className="navbar-toggler-icon" />
+          </button>
+
+          <div className={`navbar-collapse${navOpen ? '' : ' collapse'}`}>
+            <nav className="navbar-nav ms-auto align-items-md-center gap-md-3 py-2 py-md-0">
+              <a className="nav-link" href="#autok" onClick={() => setNavOpen(false)}>
+                Autók
+              </a>
+              <a
+                className="nav-link"
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault()
+                  goTo('services')
+                }}
+              >
+                Szolgáltatások
+              </a>
+              <a
+                className="nav-link"
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault()
+                  goTo('contact')
+                }}
+              >
+                Kapcsolat
+              </a>
+              {user ? (
+                <>
+                  <button
+                    type="button"
+                    className="btn btn-outline-primary btn-sm mt-2 mt-md-0"
+                    onClick={() => goTo('dashboard')}
+                  >
+                    Dashboard
+                  </button>
+                  <span className="navbar-text fw-semibold mt-2 mt-md-0">Szia, {user.first_name}!</span>
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-sm mt-2 mt-md-0"
+                    onClick={() => {
+                      signOut()
+                      goTo('home')
+                    }}
+                  >
+                    Kijelentkezés
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    className="btn btn-outline-primary btn-sm mt-2 mt-md-0"
+                    onClick={() => goTo('register')}
+                  >
+                    Regisztráció
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-sm mt-2 mt-md-0"
+                    onClick={() => goTo('login')}
+                  >
+                    Bejelentkezés
+                  </button>
+                </>
+              )}
+            </nav>
+          </div>
         </div>
       </header>
 
-      <main>
+      <main className="flex-grow-1">
         {view === 'login' && (
-          <section className="auth-section">
+          <section className="py-5">
             <div className="container">
               <LoginForm
                 onSuccess={handleAuthSuccess}
@@ -97,7 +138,7 @@ function App() {
         )}
 
         {view === 'register' && (
-          <section className="auth-section">
+          <section className="py-5">
             <div className="container">
               <RegisterForm
                 onSuccess={handleAuthSuccess}
@@ -108,68 +149,100 @@ function App() {
         )}
 
         {view === 'dashboard' && user && token && (
-          <section className="dashboard-page">
-            <Dashboard token={token} user={user} />
+          <section className="py-4 py-md-5">
+            <Dashboard token={token} user={user} onSelectCar={openCar} />
           </section>
         )}
 
         {view === 'home' && (
           <>
-            <section className="hero">
-              <div className="container hero-inner">
-                <div className="hero-content">
-                  <h1>Bérelj autót, ahogy Neked kényelmes</h1>
-                  <p className="lead">
-                    Foglalj online percek alatt, vedd át a kiválasztott helyszínen.
-                  </p>
+            <section className="py-5">
+              <div className="container">
+                <div className="row align-items-center g-5">
+                  <div className="col-12 col-lg-6 text-center text-lg-start">
+                    <h1 className="display-4 fw-medium mb-3">Bérelj autót, ahogy Neked kényelmes</h1>
+                    <p className="fs-5 text-body-secondary mb-4">
+                      Foglalj online percek alatt, vedd át a kiválasztott helyszínen.
+                    </p>
 
-                  <form className="search-card" onSubmit={(e) => e.preventDefault()}>
-                    <div className="field">
-                      <label htmlFor="location">Átvételi hely</label>
-                      <input id="location" name="location" placeholder="pl. Budapest" />
-                    </div>
-                    <div className="field">
-                      <label htmlFor="start-date">Átvétel</label>
-                      <input id="start-date" name="start-date" type="date" />
-                    </div>
-                    <div className="field">
-                      <label htmlFor="end-date">Visszahozatal</label>
-                      <input id="end-date" name="end-date" type="date" />
-                    </div>
-                    <button type="submit" className="search-button">
-                      Autók keresése
-                    </button>
-                  </form>
-                </div>
-                <div className="hero-media">
-                  <img src="/images/hero-car.webp" alt="Bérelhető autó" width={520} height={400} />
+                    <form
+                      className="row row-cols-1 row-cols-sm-2 g-3 align-items-end bg-body-secondary border rounded-3 p-3 p-md-4 text-start"
+                      onSubmit={(e) => e.preventDefault()}
+                    >
+                      <div className="col">
+                        <label className="form-label" htmlFor="location">
+                          Átvételi hely
+                        </label>
+                        <input
+                          id="location"
+                          name="location"
+                          className="form-control"
+                          placeholder="pl. Budapest"
+                        />
+                      </div>
+                      <div className="col">
+                        <label className="form-label" htmlFor="start-date">
+                          Átvétel
+                        </label>
+                        <input id="start-date" name="start-date" type="date" className="form-control" />
+                      </div>
+                      <div className="col">
+                        <label className="form-label" htmlFor="end-date">
+                          Visszahozatal
+                        </label>
+                        <input id="end-date" name="end-date" type="date" className="form-control" />
+                      </div>
+                      <div className="col">
+                        <button type="submit" className="btn btn-primary w-100">
+                          Autók keresése
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                  <div className="col-12 col-lg-6">
+                    <img
+                      src="/images/hero-car.webp"
+                      alt="Bérelhető autó"
+                      className="hero-img img-fluid w-100 rounded-4 object-fit-cover"
+                    />
+                  </div>
                 </div>
               </div>
             </section>
 
-            <section id="szolgaltatasok" className="features">
+            <section id="autok" className="py-5 border-top">
               <div className="container">
-                <h2>Miért minket válassz?</h2>
-                <div className="feature-grid">
-                  {features.map((f) => (
-                    <div className="feature-card" key={f.title}>
-                      <img className="feature-card-image" src={f.image} alt="" width={330} height={200} />
-                      <div className="feature-card-body">
-                        <h3>{f.title}</h3>
-                        <p>{f.text}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <h2 className="mb-4">Autók</h2>
+                <CarsSlider onSelectCar={openCar} />
+              </div>
+            </section>
+
+            <section className="py-5 border-top">
+              <div className="container">
+                <h2 className="mb-4">Miért minket válassz?</h2>
+                <FeatureCards />
               </div>
             </section>
           </>
         )}
+
+        {view === 'services' && <ServicesPage />}
+        {view === 'contact' && <ContactPage />}
+
+        {view === 'car-detail' && selectedCarId !== null && (
+          <CarDetailPage
+            carId={selectedCarId}
+            user={user}
+            token={token}
+            onBack={() => goTo(user ? 'dashboard' : 'home')}
+            onRequireLogin={() => goTo('login')}
+          />
+        )}
       </main>
 
-      <footer id="kapcsolat" className="site-footer">
+      <footer className="border-top py-4">
         <div className="container">
-          <p>&copy; {new Date().getFullYear()} Super Car Rental</p>
+          <p className="small text-body-secondary mb-0">&copy; {new Date().getFullYear()} Super Car Rental</p>
         </div>
       </footer>
     </>

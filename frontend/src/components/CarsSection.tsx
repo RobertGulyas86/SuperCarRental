@@ -1,16 +1,23 @@
 import { useEffect, useState } from 'react'
-import { ApiError, imageUrl, listCars, listMyCars, type Car } from '../api'
+import { ApiError, deleteCar, imageUrl, listCars, listMyCars, type Car } from '../api'
 import CarEditorModal from './CarEditorModal'
 
 interface CarsSectionProps {
   token: string | null
   canManage: boolean
+  onSelectCar: (carId: number) => void
 }
 
 const STATUS_LABELS: Record<Car['status'], string> = {
   available: 'Elérhető',
   rented: 'Bérelve',
   maintenance: 'Karbantartás alatt',
+}
+
+const STATUS_BADGE: Record<Car['status'], string> = {
+  available: 'text-bg-success',
+  rented: 'text-bg-primary',
+  maintenance: 'text-bg-danger',
 }
 
 const FUEL_LABELS: Record<Car['fuel_type'], string> = {
@@ -21,7 +28,7 @@ const FUEL_LABELS: Record<Car['fuel_type'], string> = {
   lpg: 'LPG',
 }
 
-function CarsSection({ token, canManage }: CarsSectionProps) {
+function CarsSection({ token, canManage, onSelectCar }: CarsSectionProps) {
   const [cars, setCars] = useState<Car[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [editorCar, setEditorCar] = useState<Car | null | undefined>(undefined)
@@ -43,14 +50,28 @@ function CarsSection({ token, canManage }: CarsSectionProps) {
     })
   }
 
+  async function handleDelete(car: Car) {
+    if (!token) return
+    if (!window.confirm(`Biztosan törlöd ezt a kocsit: ${car.brand} ${car.model}? A képei is törlődnek.`)) {
+      return
+    }
+    setError(null)
+    try {
+      await deleteCar(token, car.id)
+      setCars((prev) => prev?.filter((c) => c.id !== car.id) ?? prev)
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Váratlan hiba történt.')
+    }
+  }
+
   return (
-    <section className="dashboard-section">
-      <div className="section-header">
-        <h2>{canManage ? 'Kocsijaim' : 'Kocsik'}</h2>
+    <section>
+      <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+        <h2 className="h4 mb-0">{canManage ? 'Kocsijaim' : 'Kocsik'}</h2>
         {canManage && token && (
           <button
             type="button"
-            className="login-button ghost"
+            className="btn btn-outline-primary btn-sm"
             onClick={() => setEditorCar(null)}
           >
             + Új kocsi hozzáadása
@@ -58,48 +79,81 @@ function CarsSection({ token, canManage }: CarsSectionProps) {
         )}
       </div>
 
-      {error && <p className="form-error">{error}</p>}
+      {error && <p className="text-danger small">{error}</p>}
 
-      {!error && cars === null && <p className="lead-small">Betöltés...</p>}
+      {!error && cars === null && <p className="text-body-secondary small">Betöltés...</p>}
 
-      {cars && cars.length === 0 && <p className="lead-small">Még nincs felvett kocsi.</p>}
+      {cars && cars.length === 0 && (
+        <p className="text-body-secondary small">Még nincs felvett kocsi.</p>
+      )}
 
       {cars && cars.length > 0 && (
-        <div className="car-ticket-grid">
+        <div className="row row-cols-1 row-cols-sm-2 row-cols-xl-3 g-4">
           {cars.map((car) => {
             const primaryImage = car.images.find((img) => img.is_primary) ?? car.images[0]
             return (
-              <div className="car-ticket" key={car.id}>
-                <div className="car-ticket-image">
-                  {primaryImage ? (
-                    <img src={imageUrl(primaryImage.image_path)} alt={`${car.brand} ${car.model}`} />
-                  ) : (
-                    <div className="car-ticket-image-placeholder">Nincs kép</div>
-                  )}
-                  <span className={`status-badge status-${car.status}`}>
-                    {STATUS_LABELS[car.status]}
-                  </span>
-                </div>
-                <div className="car-ticket-body">
-                  <h3>
-                    {car.brand} {car.model}
-                  </h3>
-                  <p className="car-ticket-meta">
-                    {car.year} · {FUEL_LABELS[car.fuel_type]} ·{' '}
-                    {car.transmission === 'automatic' ? 'Automata' : 'Manuális'} · {car.seats} fő
-                  </p>
-                  <p className="car-ticket-price">
-                    {car.daily_price.toLocaleString('hu-HU')} Ft / nap
-                  </p>
-                  {canManage && token && (
-                    <button
-                      type="button"
-                      className="link-button"
-                      onClick={() => setEditorCar(car)}
+              <div className="col" key={car.id}>
+                <div className="card h-100">
+                  <div className="position-relative">
+                    <div className="ratio ratio-16x9 bg-body-secondary">
+                      {primaryImage ? (
+                        <img
+                          src={imageUrl(primaryImage.image_path)}
+                          alt={`${car.brand} ${car.model}`}
+                          className="object-fit-cover w-100 h-100"
+                        />
+                      ) : (
+                        <div className="d-flex align-items-center justify-content-center small text-body-secondary">
+                          Nincs kép
+                        </div>
+                      )}
+                    </div>
+                    <span
+                      className={`badge rounded-pill position-absolute top-0 end-0 m-2 ${STATUS_BADGE[car.status]}`}
                     >
-                      Szerkesztés
-                    </button>
-                  )}
+                      {STATUS_LABELS[car.status]}
+                    </span>
+                  </div>
+                  <div className="card-body d-flex flex-column gap-1">
+                    <h3 className="h6 mb-0">
+                      {car.brand} {car.model}
+                    </h3>
+                    <p className="small text-body-secondary mb-0">
+                      {car.year} · {FUEL_LABELS[car.fuel_type]} ·{' '}
+                      {car.transmission === 'automatic' ? 'Automata' : 'Manuális'} · {car.seats} fő
+                      {car.city && <> · {car.city}</>}
+                    </p>
+                    <p className="fw-semibold mb-0 mt-1">
+                      {car.daily_price.toLocaleString('hu-HU')} Ft / nap
+                    </p>
+                    <div className="d-flex gap-3 mt-2">
+                      <button
+                        type="button"
+                        className="btn btn-link p-0"
+                        onClick={() => onSelectCar(car.id)}
+                      >
+                        Részletek
+                      </button>
+                      {canManage && token && (
+                        <>
+                          <button
+                            type="button"
+                            className="btn btn-link p-0"
+                            onClick={() => setEditorCar(car)}
+                          >
+                            Szerkesztés
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-link p-0 text-danger"
+                            onClick={() => handleDelete(car)}
+                          >
+                            Törlés
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             )

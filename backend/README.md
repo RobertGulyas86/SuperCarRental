@@ -88,12 +88,20 @@ at `http://127.0.0.1:8000/docs`.
 | PUT | `/cars/{car_id}/images/{image_id}` | Update a car image's metadata (owner only, must own the car) |
 | DELETE | `/cars/{car_id}/images/{image_id}` | Delete a car image (also removes the file from disk if it was uploaded) (owner only, must own the car) |
 | GET | `/rentals` | List rentals: an owner sees rentals for their own cars, a customer sees their own bookings |
+| POST | `/rentals` | Book a car (`car_id`, `start_date`, `end_date`); customer only, `total_price` is computed server-side |
+| DELETE | `/rentals/{rental_id}` | Delete a rental (the booking's customer, or the owner of the car, may delete it) |
 
 Owner-only endpoints require `Authorization: Bearer <token>` for a user with
 `role = owner`, and mutating endpoints on a specific car additionally require
-that user to be the car's `owner_id`; car/image reads are public.
+that user to be the car's `owner_id`; car/image reads are public and include
+the car's `owner` (name, phone, email) so a renter can contact them directly —
+the platform is a marketplace, not a party to the rental agreement (see
+`ServicesPage` in the frontend). `POST /rentals` is restricted to
+`role = customer`; an owner cannot book a car (including their own).
 `Car.has_highway_vignette` tracks whether the vehicle comes with a highway
-vignette.
+vignette, and `Car.has_air_conditioning` whether it has A/C. `Car.city` is a
+free-text, optional field (no separate locations table — a car simply lives
+in a city).
 
 **Image storage:** uploaded files are saved to disk under `UPLOAD_DIR`
 (default `backend/uploads/`, gitignored), namespaced per car as
@@ -122,13 +130,15 @@ backend/
   main.py         FastAPI app + CORS setup
   config.py        Settings loaded from .env
   database.py      SQLAlchemy engine/session
-  models.py        SQLAlchemy models (User, Car, CarImage)
+  models.py        SQLAlchemy models (User, Car, CarImage, Rental)
   schemas.py        Pydantic request/response models
   security.py       Password hashing (bcrypt) and JWT helpers
+  storage.py         Shared upload-path helpers (used by cars.py and car_images.py)
   routers/
     auth.py          /auth/register, /auth/login, /auth/me
     cars.py           /cars CRUD
     car_images.py      /cars/{car_id}/images CRUD
+    rentals.py          /rentals
   requirements.txt
   .env.example
 ```

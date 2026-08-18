@@ -222,5 +222,4 @@ __marimo__/
 scripts/
 
 # Locally uploaded car images (backend/uploads/)
-backend/uploads/
 .secrets
