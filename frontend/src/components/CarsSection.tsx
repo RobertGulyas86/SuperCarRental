@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react'
-import { ApiError, deleteCar, imageUrl, listCars, listMyCars, type Car } from '../api'
+import { ApiError, deleteCar, imageUrl, listMyCars, type Car } from '../api'
 import CarEditorModal from './CarEditorModal'
 
 interface CarsSectionProps {
-  token: string | null
-  canManage: boolean
+  token: string
   onSelectCar: (carId: number) => void
 }
 
@@ -28,19 +27,18 @@ const FUEL_LABELS: Record<Car['fuel_type'], string> = {
   lpg: 'LPG',
 }
 
-function CarsSection({ token, canManage, onSelectCar }: CarsSectionProps) {
+function CarsSection({ token, onSelectCar }: CarsSectionProps) {
   const [cars, setCars] = useState<Car[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [editorCar, setEditorCar] = useState<Car | null | undefined>(undefined)
 
   function reload() {
-    const fetchCars = canManage && token ? listMyCars(token) : listCars()
-    fetchCars.then(setCars).catch((err) => {
+    listMyCars(token).then(setCars).catch((err) => {
       setError(err instanceof ApiError ? err.message : 'Váratlan hiba történt.')
     })
   }
 
-  useEffect(reload, [canManage, token])
+  useEffect(reload, [token])
 
   function handleSaved(car: Car) {
     setCars((prev) => {
@@ -51,7 +49,6 @@ function CarsSection({ token, canManage, onSelectCar }: CarsSectionProps) {
   }
 
   async function handleDelete(car: Car) {
-    if (!token) return
     if (!window.confirm(`Biztosan törlöd ezt a kocsit: ${car.brand} ${car.model}? A képei is törlődnek.`)) {
       return
     }
@@ -67,16 +64,10 @@ function CarsSection({ token, canManage, onSelectCar }: CarsSectionProps) {
   return (
     <section>
       <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-        <h2 className="h4 mb-0">{canManage ? 'Kocsijaim' : 'Kocsik'}</h2>
-        {canManage && token && (
-          <button
-            type="button"
-            className="btn btn-outline-primary btn-sm"
-            onClick={() => setEditorCar(null)}
-          >
-            + Új kocsi hozzáadása
-          </button>
-        )}
+        <h2 className="h4 mb-0">Kocsijaim</h2>
+        <button type="button" className="btn btn-outline-primary btn-sm" onClick={() => setEditorCar(null)}>
+          + Új kocsi hozzáadása
+        </button>
       </div>
 
       {error && <p className="text-danger small">{error}</p>}
@@ -134,24 +125,16 @@ function CarsSection({ token, canManage, onSelectCar }: CarsSectionProps) {
                       >
                         Részletek
                       </button>
-                      {canManage && token && (
-                        <>
-                          <button
-                            type="button"
-                            className="btn btn-link p-0"
-                            onClick={() => setEditorCar(car)}
-                          >
-                            Szerkesztés
-                          </button>
-                          <button
-                            type="button"
-                            className="btn btn-link p-0 text-danger"
-                            onClick={() => handleDelete(car)}
-                          >
-                            Törlés
-                          </button>
-                        </>
-                      )}
+                      <button type="button" className="btn btn-link p-0" onClick={() => setEditorCar(car)}>
+                        Szerkesztés
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-link p-0 text-danger"
+                        onClick={() => handleDelete(car)}
+                      >
+                        Törlés
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -161,7 +144,7 @@ function CarsSection({ token, canManage, onSelectCar }: CarsSectionProps) {
         </div>
       )}
 
-      {editorCar !== undefined && token && (
+      {editorCar !== undefined && (
         <CarEditorModal
           token={token}
           car={editorCar}

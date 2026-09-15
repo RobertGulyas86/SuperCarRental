@@ -3,6 +3,7 @@ import { ApiError, deleteRental, listRentals, type Rental, type RentalStatus } f
 
 interface RentalsSectionProps {
   token: string
+  onSelectRental: (rental: Rental) => void
 }
 
 const STATUS_LABELS: Record<RentalStatus, string> = {
@@ -23,7 +24,7 @@ function formatDate(value: string) {
   return new Date(value).toLocaleDateString('hu-HU')
 }
 
-function RentalsSection({ token }: RentalsSectionProps) {
+function RentalsSection({ token, onSelectRental }: RentalsSectionProps) {
   const [rentals, setRentals] = useState<Rental[] | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -72,8 +73,17 @@ function RentalsSection({ token }: RentalsSectionProps) {
         <div className="list-group">
           {rentals.map((rental) => (
             <div
-              className="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2"
+              className="list-group-item list-group-item-action d-flex justify-content-between align-items-center flex-wrap gap-2"
               key={rental.id}
+              role="button"
+              tabIndex={0}
+              onClick={() => onSelectRental(rental)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  onSelectRental(rental)
+                }
+              }}
             >
               <div>
                 <strong>
@@ -92,7 +102,10 @@ function RentalsSection({ token }: RentalsSectionProps) {
                 <button
                   type="button"
                   className="btn btn-link p-0 text-danger"
-                  onClick={() => handleDelete(rental)}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleDelete(rental)
+                  }}
                 >
                   Törlés
                 </button>

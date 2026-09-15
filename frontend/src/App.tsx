@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import './App.css'
+import { listRentals, type Rental } from './api'
 import CarDetailPage from './components/CarDetailPage'
 import CarsSlider from './components/CarsSlider'
 import ContactPage from './components/ContactPage'
@@ -7,22 +8,51 @@ import Dashboard from './components/Dashboard'
 import FeatureCards from './components/FeatureCards'
 import LoginForm from './components/LoginForm'
 import RegisterForm from './components/RegisterForm'
+import RentalDetailPage from './components/RentalDetailPage'
+import SearchResultsPage from './components/SearchResultsPage'
 import ServicesPage from './components/ServicesPage'
 import { useAuth } from './useAuth'
 
-type View = 'home' | 'login' | 'register' | 'dashboard' | 'services' | 'contact' | 'car-detail'
+type View =
+  | 'home'
+  | 'login'
+  | 'register'
+  | 'dashboard'
+  | 'services'
+  | 'contact'
+  | 'car-detail'
+  | 'rental-detail'
+  | 'search'
 
 function App() {
   const [view, setView] = useState<View>('home')
   const [navOpen, setNavOpen] = useState(false)
   const [selectedCarId, setSelectedCarId] = useState<number | null>(null)
+  const [selectedRental, setSelectedRental] = useState<Rental | null>(null)
+  const [pendingAuthRedirect, setPendingAuthRedirect] = useState(false)
+  const [searchLocation, setSearchLocation] = useState('')
+  const [searchStartDate, setSearchStartDate] = useState('')
+  const [searchEndDate, setSearchEndDate] = useState('')
+  const [searchFormError, setSearchFormError] = useState<string | null>(null)
   const { user, token, signIn, signOut } = useAuth()
 
   function handleAuthSuccess(token: string) {
     signIn(token)
-    setView('dashboard')
+    setPendingAuthRedirect(true)
     setNavOpen(false)
   }
+
+  useEffect(() => {
+    if (!pendingAuthRedirect || !user || !token) return
+    setPendingAuthRedirect(false)
+    if (user.role === 'owner') {
+      setView('dashboard')
+      return
+    }
+    listRentals(token)
+      .then((rentals) => setView(rentals.length > 0 ? 'dashboard' : 'home'))
+      .catch(() => setView('dashboard'))
+  }, [pendingAuthRedirect, user, token])
 
   function goTo(next: View) {
     setView(next)
@@ -32,6 +62,25 @@ function App() {
   function openCar(carId: number) {
     setSelectedCarId(carId)
     goTo('car-detail')
+  }
+
+  function openRental(rental: Rental) {
+    setSelectedRental(rental)
+    goTo('rental-detail')
+  }
+
+  function handleSearchSubmit(e: FormEvent) {
+    e.preventDefault()
+    if (Boolean(searchStartDate) !== Boolean(searchEndDate)) {
+      setSearchFormError('Add meg mindkét dátumot, vagy hagyd üresen mindkettőt.')
+      return
+    }
+    if (searchStartDate && searchEndDate && searchEndDate <= searchStartDate) {
+      setSearchFormError('A visszahozatal dátumának az átvétel dátuma után kell lennie.')
+      return
+    }
+    setSearchFormError(null)
+    goTo('search')
   }
 
   return (
@@ -58,8 +107,15 @@ function App() {
 
           <div className={`navbar-collapse${navOpen ? '' : ' collapse'}`}>
             <nav className="navbar-nav ms-auto align-items-md-center gap-md-3 py-2 py-md-0">
-              <a className="nav-link" href="#autok" onClick={() => setNavOpen(false)}>
-                Autók
+              <a
+                className="nav-link"
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault()
+                  goTo('home')
+                }}
+              >
+                Home
               </a>
               <a
                 className="nav-link"
@@ -150,7 +206,7 @@ function App() {
 
         {view === 'dashboard' && user && token && (
           <section className="py-4 py-md-5">
-            <Dashboard token={token} user={user} onSelectCar={openCar} />
+            <Dashboard token={token} user={user} onSelectCar={openCar} onSelectRental={openRental} />
           </section>
         )}
 
@@ -167,7 +223,7 @@ function App() {
 
                     <form
                       className="row row-cols-1 row-cols-sm-2 g-3 align-items-end bg-body-secondary border rounded-3 p-3 p-md-4 text-start"
-                      onSubmit={(e) => e.preventDefault()}
+                      onSubmit={handleSearchSubmit}
                     >
                       <div className="col">
                         <label className="form-label" htmlFor="location">
@@ -178,20 +234,42 @@ function App() {
                           name="location"
                           className="form-control"
                           placeholder="pl. Budapest"
+                          value={searchLocation}
+                          onChange={(e) => setSearchLocation(e.target.value)}
                         />
                       </div>
                       <div className="col">
                         <label className="form-label" htmlFor="start-date">
                           Átvétel
                         </label>
-                        <input id="start-date" name="start-date" type="date" className="form-control" />
+                        <input
+                          id="start-date"
+                          name="start-date"
+                          type="date"
+                          className="form-control"
+                          value={searchStartDate}
+                          onChange={(e) => setSearchStartDate(e.target.value)}
+                        />
                       </div>
                       <div className="col">
                         <label className="form-label" htmlFor="end-date">
                           Visszahozatal
                         </label>
-                        <input id="end-date" name="end-date" type="date" className="form-control" />
+                        <input
+                          id="end-date"
+                          name="end-date"
+                          type="date"
+                          className="form-control"
+                          min={searchStartDate || undefined}
+                          value={searchEndDate}
+                          onChange={(e) => setSearchEndDate(e.target.value)}
+                        />
                       </div>
+                      {searchFormError && (
+                        <div className="col-12">
+                          <p className="text-danger small mb-0">{searchFormError}</p>
+                        </div>
+                      )}
                       <div className="col">
                         <button type="submit" className="btn btn-primary w-100">
                           Autók keresése
@@ -210,7 +288,7 @@ function App() {
               </div>
             </section>
 
-            <section id="autok" className="py-5 border-top">
+            <section className="py-5 border-top">
               <div className="container">
                 <h2 className="mb-4">Autók</h2>
                 <CarsSlider onSelectCar={openCar} />
@@ -236,6 +314,26 @@ function App() {
             token={token}
             onBack={() => goTo(user ? 'dashboard' : 'home')}
             onRequireLogin={() => goTo('login')}
+            onSelectRental={openRental}
+          />
+        )}
+
+        {view === 'rental-detail' && selectedRental && token && (
+          <RentalDetailPage
+            rental={selectedRental}
+            token={token}
+            onBack={() => goTo('dashboard')}
+            onDeleted={() => goTo('dashboard')}
+          />
+        )}
+
+        {view === 'search' && (
+          <SearchResultsPage
+            city={searchLocation}
+            startDate={searchStartDate}
+            endDate={searchEndDate}
+            onSelectCar={openCar}
+            onBack={() => goTo('home')}
           />
         )}
       </main>

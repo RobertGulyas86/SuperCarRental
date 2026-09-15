@@ -101,6 +101,11 @@ export interface Rental {
   created_at: string
 }
 
+export interface BookedRange {
+  start_date: string
+  end_date: string
+}
+
 export class ApiError extends Error {}
 
 function authHeaders(token: string): HeadersInit {
@@ -166,6 +171,31 @@ export function listMyCars(token: string) {
 
 export function getCar(carId: number) {
   return request<Car>(`/cars/${carId}`)
+}
+
+export function getCarAvailability(carId: number, excludeRentalId?: number) {
+  const query = excludeRentalId ? `?exclude_rental_id=${excludeRentalId}` : ''
+  return request<BookedRange[]>(`/cars/${carId}/availability${query}`)
+}
+
+export interface CarSearchParams {
+  city?: string
+  start_date?: string
+  end_date?: string
+}
+
+export interface CarSearchResult {
+  matching: Car[]
+  other: Car[]
+}
+
+export function searchCars(params: CarSearchParams) {
+  const query = new URLSearchParams()
+  if (params.city) query.set('city', params.city)
+  if (params.start_date) query.set('start_date', params.start_date)
+  if (params.end_date) query.set('end_date', params.end_date)
+  const qs = query.toString()
+  return request<CarSearchResult>(`/cars/search${qs ? `?${qs}` : ''}`)
 }
 
 export function createCar(token: string, payload: CarPayload) {
@@ -256,6 +286,19 @@ export interface RentalCreatePayload {
 export function createRental(token: string, payload: RentalCreatePayload) {
   return request<Rental>('/rentals', {
     method: 'POST',
+    headers: authHeaders(token),
+    body: JSON.stringify(payload),
+  })
+}
+
+export interface RentalUpdatePayload {
+  start_date: string
+  end_date: string
+}
+
+export function updateRental(token: string, rentalId: number, payload: RentalUpdatePayload) {
+  return request<Rental>(`/rentals/${rentalId}`, {
+    method: 'PATCH',
     headers: authHeaders(token),
     body: JSON.stringify(payload),
   })

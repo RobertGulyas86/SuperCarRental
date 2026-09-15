@@ -124,11 +124,21 @@ class CarOut(CarBase):
     images: list[CarImageOut] = []
 
 
+class CarSearchResult(BaseModel):
+    matching: list[CarOut]
+    other: list[CarOut]
+
+
 RentalStatus = Literal["reserved", "ongoing", "completed", "cancelled"]
 
 
 class RentalCreate(BaseModel):
     car_id: int
+    start_date: date
+    end_date: date
+
+
+class RentalUpdate(BaseModel):
     start_date: date
     end_date: date
 
@@ -143,3 +153,10 @@ class RentalOut(BaseModel):
     total_price: float
     status: RentalStatus
     created_at: datetime
+
+
+class BookedRangeOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    start_date: date
+    end_date: date
