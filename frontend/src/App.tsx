@@ -318,10 +318,11 @@ function App() {
           />
         )}
 
-        {view === 'rental-detail' && selectedRental && token && (
+        {view === 'rental-detail' && selectedRental && token && user && (
           <RentalDetailPage
             rental={selectedRental}
             token={token}
+            user={user}
             onBack={() => goTo('dashboard')}
             onDeleted={() => goTo('dashboard')}
           />

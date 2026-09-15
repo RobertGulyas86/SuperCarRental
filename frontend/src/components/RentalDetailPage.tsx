@@ -1,11 +1,12 @@
 import { useState, type FormEvent } from 'react'
-import { ApiError, deleteRental, updateRental, type Rental } from '../api'
+import { ApiError, deleteRental, updateRental, type Rental, type User } from '../api'
 import CarImageGallery from './CarImageGallery'
 import DateRangePicker from './DateRangePicker'
 
 interface RentalDetailPageProps {
   rental: Rental
   token: string
+  user: User
   onBack: () => void
   onDeleted: () => void
 }
@@ -46,7 +47,7 @@ function nightsBetween(start: string, end: string): number {
   return Math.max(0, Math.round(ms / (1000 * 60 * 60 * 24)))
 }
 
-function RentalDetailPage({ rental: initialRental, token, onBack, onDeleted }: RentalDetailPageProps) {
+function RentalDetailPage({ rental: initialRental, token, user, onBack, onDeleted }: RentalDetailPageProps) {
   const [rental, setRental] = useState(initialRental)
   const [editing, setEditing] = useState(false)
   const [startDate, setStartDate] = useState(rental.start_date)
@@ -56,6 +57,8 @@ function RentalDetailPage({ rental: initialRental, token, onBack, onDeleted }: R
   const [deleting, setDeleting] = useState(false)
 
   const { car } = rental
+  const contact = user.role === 'owner' ? rental.customer : car.owner
+  const contactTitle = user.role === 'owner' ? 'Bérlő elérhetősége' : 'Bérbeadó elérhetősége'
   const nights = nightsBetween(rental.start_date, rental.end_date)
   const editNights = nightsBetween(startDate, endDate)
   const canModify = rental.status === 'reserved'
@@ -127,15 +130,15 @@ function RentalDetailPage({ rental: initialRental, token, onBack, onDeleted }: R
 
           <div className="card">
             <div className="card-body">
-              <h2 className="h6 mb-2">Bérbeadó elérhetősége</h2>
+              <h2 className="h6 mb-2">{contactTitle}</h2>
               <p className="mb-1">
-                {car.owner.first_name} {car.owner.last_name}
+                {contact.first_name} {contact.last_name}
               </p>
               <p className="mb-1">
-                <a href={`tel:${car.owner.phone_number}`}>{car.owner.phone_number}</a>
+                <a href={`tel:${contact.phone_number}`}>{contact.phone_number}</a>
               </p>
               <p className="mb-0">
-                <a href={`mailto:${car.owner.email}`}>{car.owner.email}</a>
+                <a href={`mailto:${contact.email}`}>{contact.email}</a>
               </p>
             </div>
           </div>

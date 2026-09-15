@@ -143,11 +143,22 @@ class RentalUpdate(BaseModel):
     end_date: date
 
 
+class RentalCustomerOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    first_name: str
+    last_name: str
+    phone_number: str
+    email: EmailStr
+
+
 class RentalOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
     car: CarOut
+    customer: RentalCustomerOut
     start_date: date
     end_date: date
     total_price: float

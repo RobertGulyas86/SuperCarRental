@@ -91,9 +91,18 @@ export interface CarPayload {
 
 export type RentalStatus = 'reserved' | 'ongoing' | 'completed' | 'cancelled'
 
+export interface RentalCustomer {
+  id: number
+  first_name: string
+  last_name: string
+  phone_number: string
+  email: string
+}
+
 export interface Rental {
   id: number
   car: Car
+  customer: RentalCustomer
   start_date: string
   end_date: string
   total_price: number
